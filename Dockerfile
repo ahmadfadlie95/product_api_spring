@@ -3,6 +3,6 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 FROM openjdk:17.0.1-jdk-slim
-COPY --from=build /target/hello-spring-0.0.1-SNAPSHOT.jar hello-spring.jar
+COPY --from=build /target/hello-sprint-0.0.1-SNAPSHOT.jar hello-sprint.jar
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","hello-spring.jar"]
+ENTRYPOINT ["java","-jar","hello-sprint.jar"]
