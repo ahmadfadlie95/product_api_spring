@@ -1,5 +1,6 @@
 package com.example.hellosprint.controllers;
 
+import com.example.hellosprint.data.ProductRequest;
 import com.example.hellosprint.models.Product;
 import com.example.hellosprint.services.ProductService;
 import jakarta.validation.Valid;
@@ -20,8 +21,8 @@ public class ProductController {
     final ProductService productService;
 
     @PostMapping //panggil method POST
-    public ResponseEntity<?> createProduct(@RequestBody @Valid Product product){ //req body -> data yg dihantar dari body kena ikut format java
-        Product product1 = productService.createProduct(product);
+    public ResponseEntity<?> createProduct(@RequestBody @Valid ProductRequest product){ //req body -> data yg dihantar dari body kena ikut format java
+        ProductRequest product1 = productService.createProduct(product);
     if (product1 != null){
         URI uri = URI.create("/api/products/"+product1.getId());
         return ResponseEntity.created(uri).body(product1);
@@ -32,13 +33,19 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<?> getAllProducts(){
-        List<Product> products = productService.getAllProducts();
+        List<ProductRequest> products = productService.getAllProducts();
         if (products.size() != 0){
             return ResponseEntity.ok(products);
         } else {
             return ResponseEntity.noContent().build();
         }
     }
+    @GetMapping("/by-category/{categoryId}")
+    public ResponseEntity<List<ProductRequest>> getProductsByCategory(@PathVariable Long categoryId) {
+        List<ProductRequest> products = productService.findByCategory(categoryId);
+        return ResponseEntity.ok(products);
+    }
+
 
     @GetMapping("/{id}")
     public ResponseEntity <?> findProductById(@PathVariable("id") Long id ){

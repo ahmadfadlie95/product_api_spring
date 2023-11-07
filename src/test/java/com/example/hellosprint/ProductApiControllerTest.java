@@ -1,5 +1,6 @@
 package com.example.hellosprint;
 import com.example.hellosprint.controllers.ProductController;
+import com.example.hellosprint.data.ProductRequest;
 import com.example.hellosprint.models.Product;
 import com.example.hellosprint.services.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,9 +16,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProductController.class)
@@ -48,7 +48,7 @@ public class ProductApiControllerTest {
         product.setPrice(2.50);
         product.setImageUrl("https://www.google.com");
 
-        Mockito.when(productService.createProduct(product)).thenReturn(product); //expect ada product dalam body
+        Mockito.when(productService.createProduct(product.getDto())).thenReturn(product.getDto()); //expect ada product dalam body
 
         String requestBody = objectMapper.writeValueAsString(product);
 
@@ -114,7 +114,7 @@ public class ProductApiControllerTest {
         product2.setImageUrl("www.google.com");
         product2.setId(2L);
 
-        List<Product> listProduct = List.of(product, product2);
+        List<ProductRequest> listProduct = List.of(product.getDto(), product2.getDto());
 
         Mockito.when(productService.getAllProducts()).thenReturn(listProduct);
 
@@ -123,6 +123,87 @@ public class ProductApiControllerTest {
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("$[0].name", is("Kopi O")))
                 .andExpect(jsonPath("$[1].name", is("Teh O")))
+                .andDo(print());
+    }
+    @Test
+    public void testUpdateShouldReturn404NotFound() throws Exception {
+        Long productId = 123L;
+        String requestURI = END_POINT_PATH + "/" + productId;
+
+        Product product = new Product();
+        product.setName("Kopi O");
+        product.setDescription("Air Panas");
+        product.setPrice(3.5);
+        product.setImageUrl("www.google.com");
+        product.setId(1L);
+
+        //Mockito.when(productService.updateProduct(product)).thenThrow(UserNotFoundException.class);
+
+        String requestBody = objectMapper.writeValueAsString(product);
+
+        mockMvc.perform(put(requestURI).contentType("application/json").content(requestBody))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+    @Test
+    public void testUpdateShouldReturn400BadRequest() throws Exception {
+        Long productId = 123L;
+        String requestURI = END_POINT_PATH + "/" + productId;
+
+        Product product = new Product();
+        product.setName("Kopi O");
+        product.setDescription("Air Panas");
+        product.setPrice(3.5);
+        product.setImageUrl("www.google.com");
+        product.setId(1L);
+
+        String requestBody = objectMapper.writeValueAsString(product);
+
+        mockMvc.perform(put(requestURI).contentType("application/json").content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+    @Test
+    public void testUpdateShouldReturn200OK() throws Exception {
+        Long productId = 123L;
+        String requestURI = END_POINT_PATH + "/" + productId;
+
+        Product product = new Product();
+        product.setName("Kopi O");
+        product.setDescription("Air Panas");
+        product.setPrice(3.5);
+        product.setImageUrl("www.google.com");
+        product.setId(1L);
+
+        //Mockito.when(productService.updateProduct(product)).thenReturn(product);
+
+        String requestBody = objectMapper.writeValueAsString(product);
+
+        mockMvc.perform(put(requestURI).contentType("application/json").content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is("Kopi O")))
+                .andDo(print());
+    }
+    @Test
+    public void testDeleteShouldReturn404NotFound() throws Exception {
+        Long productId = 123L;
+        String requestURI = END_POINT_PATH + "/" + productId;
+
+        Mockito.doThrow(ProductNotFoundException.class).when(productService).deleteProduct(productId);;
+
+        mockMvc.perform(delete(requestURI))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+    @Test
+    public void testDeleteShouldReturn200OK() throws Exception {
+        Long productId = 123L;
+        String requestURI = END_POINT_PATH + "/" + productId;
+
+        Mockito.doNothing().when(productService).deleteProduct(productId);;
+
+        mockMvc.perform(delete(requestURI))
+                .andExpect(status().isNoContent())
                 .andDo(print());
     }
 }

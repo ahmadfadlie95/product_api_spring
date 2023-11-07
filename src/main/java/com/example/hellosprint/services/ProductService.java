@@ -1,5 +1,6 @@
 package com.example.hellosprint.services;
 
+import com.example.hellosprint.data.ProductRequest;
 import com.example.hellosprint.models.Product;
 
 import java.util.List;
@@ -8,9 +9,11 @@ import java.util.Optional;
 //inside interface, list all the methods in impl
 public interface ProductService {
 
-    Product createProduct(Product newProduct);
+    ProductRequest createProduct(ProductRequest newProduct);
 
-    List<Product> getAllProducts();
+    List<ProductRequest> getAllProducts();
+    List<ProductRequest> findByCategory(Long categoryId);
+
 
     Optional<Product> findById(Long id);
 

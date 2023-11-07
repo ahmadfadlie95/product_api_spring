@@ -1,7 +1,11 @@
 package com.example.hellosprint.models;
 
+import com.example.hellosprint.data.ProductRequest;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 //Entity - this is our model,create in database
 @Entity
@@ -23,4 +27,25 @@ public class Product {
     private Double price;
 
     private String imageUrl;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name="category_id", nullable = false) //dekat parent takde joincolumn
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private Category category;
+
+    //product to json transformer
+    public ProductRequest getDto() {
+        ProductRequest productDto = new ProductRequest();
+        productDto.setId(id);
+        productDto.setName(name);
+        productDto.setPrice(price);
+        productDto.setDescription(description);
+        productDto.setImageUrl(imageUrl);
+        productDto.setCategoryId(category.getId());
+        return productDto;
+    }
+
+
+
 }
