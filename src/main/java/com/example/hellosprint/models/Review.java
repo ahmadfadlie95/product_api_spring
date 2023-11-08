@@ -18,13 +18,13 @@ public class Review {
     private String review;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name="review_id", nullable = false) //dekat parent takde joincolumn
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name="user_id", nullable = false) //dekat parent takde joincolumn
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
     private User user;
 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name="product_id", nullable = false) //dekat parent takde joincolumn
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Product product;
 }
