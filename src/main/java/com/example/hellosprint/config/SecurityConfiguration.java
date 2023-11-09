@@ -33,6 +33,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/api/login", "/api/register").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/products/**").hasAnyAuthority(Role.USER.name(), Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.GET, "/api/**").hasAnyAuthority(Role.USER.name(), Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.POST, "/api/**").hasAuthority(Role.ADMIN.name())
                                 .requestMatchers(HttpMethod.PUT, "/api/**").hasAuthority(Role.ADMIN.name())

@@ -7,6 +7,8 @@ import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.List;
+
 //Entity - this is our model,create in database
 @Entity
 @Table(name = "products") //I want to override the table name to product - ni nak override the name sahaja
@@ -34,7 +36,15 @@ public class Product {
     @JsonIgnore
     private Category category;
 
+
+    // Automatically dia akan keluar bila API find dipanggil
+    // Keluar di dalam []
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "product", cascade = CascadeType.ALL)
+    private List<Review> reviews;
     //product to json transformer
+
+    //product to json transformer
+    @JsonIgnore
     public ProductRequest getDto() {
         ProductRequest productDto = new ProductRequest();
         productDto.setId(id);

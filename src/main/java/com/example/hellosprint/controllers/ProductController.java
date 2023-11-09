@@ -1,12 +1,17 @@
 package com.example.hellosprint.controllers;
 
 import com.example.hellosprint.data.ProductRequest;
+import com.example.hellosprint.data.ReviewRequest;
 import com.example.hellosprint.models.Product;
+import com.example.hellosprint.models.User;
 import com.example.hellosprint.services.ProductService;
+import com.example.hellosprint.services.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
+import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -19,6 +24,7 @@ import java.util.Optional;
 public class ProductController {
 
     final ProductService productService;
+    final ReviewService reviewService;
 
     @PostMapping //panggil method POST
     public ResponseEntity<?> createProduct(@RequestBody @Valid ProductRequest product){ //req body -> data yg dihantar dari body kena ikut format java
@@ -62,4 +68,13 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable("id") Long id){productService.deleteProduct(id);}
+
+    @PostMapping("/{id}/reviews")
+    public ResponseEntity <?> createReview(@PathVariable("id") Long productId, @RequestBody ReviewRequest request, Authentication authentication) throws Exception {
+        //Dapatkan id user dari jwt header
+        User currentUser = (User) authentication.getPrincipal();
+        Long userId = (Long)currentUser.getId();
+
+        return ResponseEntity.ok(reviewService.addReview(request,productId,userId));
+    }
 }
